@@ -1,0 +1,66 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace P2IdealGas
+{
+    public partial class MainPage : ContentPage
+    {
+        string[] gasNames = { "Oxygen", "Nitrogen", "Carbon Dioxide" };
+        double[] molecularWeights = { 32.00, 28.02, 44.01 };
+
+        public MainPage()
+        {
+            InitializeComponent();
+        }
+
+        private void OnCalculatePressureClicked(object sender, EventArgs e)
+        {
+            try
+            {
+                string gasName = GasNameEntry.Text;
+                double molecularWeight = GetMolecularWeightFromName(gasName);
+
+                if (molecularWeight == -1)
+                {
+                    ResultLabel.Text = "Error: Gas not found.";
+                    return;
+                }
+
+                IdealGas gas = new IdealGas();
+                gas.SetMolecularWeight(molecularWeight);
+                gas.SetVolume(double.Parse(VolumeEntry.Text));
+                gas.SetMass(double.Parse(MassEntry.Text));
+                gas.SetTemp(double.Parse(TempEntry.Text));
+
+                ResultLabel.Text = $"The pressure of the gas is {gas.GetPressure()} Pascals.";
+            }
+            catch (FormatException)
+            {
+                ResultLabel.Text = "Error: Invalid input format.";
+            }
+            catch (OverflowException)
+            {
+                ResultLabel.Text = "Error: Input value is too large or too small.";
+            }
+            catch (Exception exc)
+            {
+                ResultLabel.Text = "Error: " + exc.Message;
+            }
+        }
+
+        private double GetMolecularWeightFromName(string name)
+        {
+            for (int i = 0; i < gasNames.Length; i++)
+            {
+                if (gasNames[i].Equals(name, StringComparison.OrdinalIgnoreCase))
+                {
+                    return molecularWeights[i];
+                }
+            }
+            return -1;
+        }
+    }
+}
